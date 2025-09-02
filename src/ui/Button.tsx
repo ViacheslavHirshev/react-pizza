@@ -1,3 +1,4 @@
+import { MouseEventHandler } from "react";
 import { Link } from "react-router-dom";
 
 interface ButtonProps {
@@ -5,9 +6,16 @@ interface ButtonProps {
   disabled?: boolean;
   to?: string;
   type: "small" | "primary" | "secondary";
+  onClick?: MouseEventHandler<HTMLButtonElement>;
 }
 
-function Button({ children, disabled = false, type, to }: ButtonProps) {
+function Button({
+  children,
+  disabled = false,
+  type,
+  to,
+  onClick,
+}: ButtonProps) {
   const base = `inline-block text-sm bg-yellow-400 uppercase font-semibold text-stone-800 
   py-3 px-4 tracking-wide rounded-full hover:bg-yellow-300 transition-colors duration-300
   focus:outline-none focus:ring focus:bg-yellow-300 focus:ring-yellow-300 focus:ring-offset-2
@@ -21,6 +29,14 @@ function Button({ children, disabled = false, type, to }: ButtonProps) {
   focus:outline-none focus:ring focus:bg-stone-300 focus:ring-stone-300 focus:ring-offset-2 focus:text-stone-800
   disabled:cursor-not-allowed sm:px-6 sm:py-4 px-4 py-2.5 md:px-6 md:py-3.5 cursor-pointer hover:text-stone-800`,
   };
+
+  if (onClick) {
+    return (
+      <button onClick={onClick} disabled={disabled} className={styles[type]}>
+        {children}
+      </button>
+    );
+  }
 
   if (to)
     return (

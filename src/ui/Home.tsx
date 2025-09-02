@@ -1,6 +1,10 @@
 import CreateUser from "../features/user/CreateUser";
+import { useAppSelector } from "../hooks";
+import Button from "./Button";
 
 function Home() {
+  const username = useAppSelector((store) => store.userReducer.username);
+
   return (
     <div className="my-10 text-center sm:my-16 px-4">
       <h1 className="mb-8 text-xl md:text-3xl text-stone-700 font-semibold text-center">
@@ -11,7 +15,13 @@ function Home() {
         </span>
       </h1>
 
-      <CreateUser />
+      {username === "" ? (
+        <CreateUser />
+      ) : (
+        <Button to="/menu" type="primary">
+          Go to menu
+        </Button>
+      )}
     </div>
   );
 }

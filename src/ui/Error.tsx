@@ -1,5 +1,5 @@
 import { isRouteErrorResponse, useRouteError } from "react-router-dom";
-import LinkButton from "./LinkButton";
+import CustomLink from "./CustomLink";
 
 function NotFound() {
   const error = useRouteError();
@@ -14,7 +14,7 @@ function NotFound() {
       ) : (
         <p>Unknown error: {error as string}</p>
       )}
-      <LinkButton to="-1">&larr; Go back</LinkButton>
+      <CustomLink to="-1">&larr; Go back</CustomLink>
     </div>
   );
 }

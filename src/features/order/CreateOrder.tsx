@@ -8,6 +8,7 @@ import {
 import { ICustomerOrder } from "../../types";
 import { createOrder } from "../../services/apiRestaurant";
 import Button from "../../ui/Button";
+import { useAppSelector } from "../../hooks";
 
 const fakeCart = [
   {
@@ -40,6 +41,7 @@ function CreateOrder() {
   const isSubmitting = navigation.state === "submitting";
 
   const actionData = useActionData() as string;
+  const username = useAppSelector((state) => state.userReducer.username);
 
   return (
     <div className="px-4 py-6">
@@ -48,7 +50,13 @@ function CreateOrder() {
       <Form method="POST">
         <div className="mb-5 flex gap-2 flex-col sm:flex-row sm:items-center">
           <label className="sm:basis-40">First Name</label>
-          <input type="text" name="customer" required className="input grow" />
+          <input
+            type="text"
+            name="customer"
+            required
+            className="input grow"
+            defaultValue={username}
+          />
         </div>
 
         <div className="mb-5 flex gap-2 flex-col sm:flex-row sm:items-center">

@@ -5,7 +5,7 @@ interface LinkButtonProps {
   to: string;
 }
 
-function LinkButton({ children, to }: LinkButtonProps) {
+function CustomLink({ children, to }: LinkButtonProps) {
   const navigate = useNavigate();
   const className =
     "text-sm text-blue-500 hover:text-blue-700 hover:underline cursor-pointer";
@@ -24,4 +24,4 @@ function LinkButton({ children, to }: LinkButtonProps) {
   );
 }
 
-export default LinkButton;
+export default CustomLink;
