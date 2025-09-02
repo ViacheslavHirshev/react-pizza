@@ -1,13 +1,20 @@
-import { useNavigate } from 'react-router-dom';
+import { isRouteErrorResponse, useRouteError } from "react-router-dom";
+import LinkButton from "./LinkButton";
 
 function NotFound() {
-  const navigate = useNavigate();
+  const error = useRouteError();
 
   return (
     <div>
       <h1>Something went wrong 😢</h1>
-      <p>%MESSAGE%</p>
-      <button onClick={() => navigate(-1)}>&larr; Go back</button>
+      {isRouteErrorResponse(error) ? (
+        <p>{error.data}</p>
+      ) : error instanceof Error ? (
+        <p>{error.message}</p>
+      ) : (
+        <p>Unknown error: {error as string}</p>
+      )}
+      <LinkButton to="-1">&larr; Go back</LinkButton>
     </div>
   );
 }
