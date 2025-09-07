@@ -21,7 +21,7 @@ function Order() {
     estimatedDelivery,
     cart,
   } = order;
-  const deliveryIn = calcMinutesLeft(estimatedDelivery);
+  const deliveryIn = calcMinutesLeft(Number(estimatedDelivery));
 
   return (
     <div className="py-6 px-4 space-y-8">
@@ -52,7 +52,9 @@ function Order() {
       >
         <p className="font-medium">
           {deliveryIn >= 0
-            ? `Only ${calcMinutesLeft(estimatedDelivery)} minutes left 😃`
+            ? `Only ${calcMinutesLeft(
+                Number(estimatedDelivery)
+              )} minutes left 😃`
             : "Order should have arrived"}
         </p>
         <p className="text-xs text-stone-500">
