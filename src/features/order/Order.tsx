@@ -1,4 +1,8 @@
-import { LoaderFunctionArgs, useLoaderData } from "react-router-dom";
+import {
+  LoaderFunctionArgs,
+  useFetcher,
+  useLoaderData,
+} from "react-router-dom";
 import { getOrder } from "../../services/apiRestaurant";
 import { INewOrder } from "../../types";
 import {
@@ -7,10 +11,20 @@ import {
   formatDate,
 } from "../../utils/helpers";
 import OrderItem from "./OrderItem";
+import { useEffect } from "react";
+import type { loader as menuLoader } from "../menu/Menu";
+import UpdateOrder from "./UpdateOrder";
 
 function Order() {
+  type MenuLoaderData = Awaited<ReturnType<typeof menuLoader>>;
+
   const order = useLoaderData() as INewOrder;
-  // console.log(order);
+
+  const fetcher = useFetcher<MenuLoaderData>();
+
+  useEffect(() => {
+    if (!fetcher.data && fetcher.state === "idle") fetcher.load("/menu");
+  }, [fetcher]);
 
   const {
     id,
@@ -64,7 +78,15 @@ function Order() {
 
       <ul className="divide-y divide-stone-200 border-b border-t border-stone-200">
         {cart.map((item) => (
-          <OrderItem item={item} key={item.pizzaId} />
+          <OrderItem
+            item={item}
+            key={item.pizzaId}
+            isLoadingIngredients={fetcher.state === "loading"}
+            ingredients={
+              fetcher?.data?.find((el) => el.id === item.pizzaId)
+                ?.ingredients ?? []
+            }
+          />
         ))}
       </ul>
 
@@ -81,6 +103,8 @@ function Order() {
           To pay on delivery: {formatCurrency(orderPrice + priorityPrice)}
         </p>
       </div>
+
+      {!priority && <UpdateOrder />}
     </div>
   );
 }

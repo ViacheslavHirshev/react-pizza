@@ -20,7 +20,9 @@ export async function getOrder(id: string) {
   return data;
 }
 
-export async function createOrder(newOrder: ICustomerOrder): Promise<INewOrder> {
+export async function createOrder(
+  newOrder: ICustomerOrder
+): Promise<INewOrder> {
   try {
     const res = await fetch(`${API_URL}/order`, {
       method: "POST",
@@ -38,7 +40,10 @@ export async function createOrder(newOrder: ICustomerOrder): Promise<INewOrder> 
   }
 }
 
-export async function updateOrder(id: string, updateObj: INewOrder) {
+export async function updateOrder(
+  id: string | undefined,
+  updateObj: { priority: boolean }
+) {
   try {
     const res = await fetch(`${API_URL}/order/${id}`, {
       method: "PATCH",

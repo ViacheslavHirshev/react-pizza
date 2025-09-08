@@ -35,7 +35,7 @@ function CreateOrder() {
   } = useAppSelector((state) => state.userReducer);
   const totalCartPrice = useAppSelector(getTotalCartPrice);
 
-  const priorityPrice = withPriority ? 2 : 0;
+  const priorityPrice = withPriority ? Math.round(totalCartPrice * 0.2) : 0;
   const totalPrice = totalCartPrice + priorityPrice;
 
   const isLoadingAddress = addressStatus === "loading";
