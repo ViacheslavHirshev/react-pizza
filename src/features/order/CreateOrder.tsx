@@ -8,12 +8,13 @@ import {
 import { ICustomerOrder } from "../../types";
 import { createOrder } from "../../services/apiRestaurant";
 import Button from "../../ui/Button";
-import { useAppSelector } from "../../hooks";
+import { useAppDispatch, useAppSelector } from "../../hooks";
 import { clearCart, getCart, getTotalCartPrice } from "../cart/cartSlice";
 import EmptyCart from "../cart/EmptyCart";
 import store from "../../store";
 import { formatCurrency } from "../../utils/helpers";
 import { useState } from "react";
+import { fetchAddress } from "../user/userSlice";
 
 function CreateOrder() {
   const [withPriority, setWithPriority] = useState(false);
@@ -23,12 +24,21 @@ function CreateOrder() {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
 
+  const dispatch = useAppDispatch();
   const cart = useAppSelector(getCart);
-  const username = useAppSelector((state) => state.userReducer.username);
+  const {
+    username,
+    status: addressStatus,
+    position,
+    address,
+    error: errorAddress,
+  } = useAppSelector((state) => state.userReducer);
   const totalCartPrice = useAppSelector(getTotalCartPrice);
 
-  const priorityPrice = withPriority ? 1.2 : 0;
+  const priorityPrice = withPriority ? 2 : 0;
   const totalPrice = totalCartPrice + priorityPrice;
+
+  const isLoadingAddress = addressStatus === "loading";
 
   if (!cart.length) return <EmptyCart />;
 
@@ -60,7 +70,7 @@ function CreateOrder() {
           </div>
         </div>
 
-        <div className="mb-5 flex gap-2 flex-col sm:flex-row sm:items-center">
+        <div className="mb-5 flex gap-2 flex-col sm:flex-row sm:items-center relative">
           <label className="sm:basis-40">Address</label>
           <div className="grow">
             <input
@@ -68,8 +78,30 @@ function CreateOrder() {
               name="address"
               required
               className="input w-full"
+              disabled={isLoadingAddress}
+              defaultValue={address}
             />
+            {addressStatus === "error" && (
+              <p className="mt-2 text-xs text-red-500 bg-red-100 rounded-md p-2">
+                {errorAddress}
+              </p>
+            )}
           </div>
+
+          {!position.latitude && !position.longitude && (
+            <span className="absolute right-[3px] top-[35px] sm:top-[3px] z-100">
+              <Button
+                disabled={isLoadingAddress}
+                type="small"
+                onClick={(e) => {
+                  e.preventDefault();
+                  dispatch(fetchAddress());
+                }}
+              >
+                Get position
+              </Button>
+            </span>
+          )}
         </div>
 
         <div className="flex items-center gap-4 mb-12">
@@ -89,7 +121,15 @@ function CreateOrder() {
 
         <div>
           <input type="hidden" value={JSON.stringify(cart)} name="cart" />
-          <Button disabled={isSubmitting} type="primary">
+          <input
+            type="hidden"
+            name="position"
+            value={
+              position ? `${position.latitude}, ${position.longitude}` : ""
+            }
+          ></input>
+
+          <Button disabled={isSubmitting || isLoadingAddress} type="primary">
             {isSubmitting
               ? "Placing order..."
               : `Order now from ${formatCurrency(totalPrice)}`}
@@ -106,13 +146,23 @@ export async function action({ request }: ActionFunctionArgs) {
     Array.from(formData.entries()).map(([key, value]) => [key, String(value)])
   );
 
+  // const data = Object.fromEntries(formData);
+  // const order = {
+  //   ...data,
+  //   cart: JSON.parse(data.cart),
+  //   priority: data.priority === "on",
+  // };
+
   const order: ICustomerOrder = {
     address: data.address,
     cart: JSON.parse(data.cart),
     customer: data.customer,
     phone: data.phone,
     priority: data.priority === "on",
+    position: data.position,
   };
+
+  // console.log(order);
 
   const { isValid, message } = checkPhoneNumber(order.phone);
   if (!isValid) return message;

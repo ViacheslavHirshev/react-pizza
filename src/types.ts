@@ -35,4 +35,5 @@ export interface ICustomerOrder {
   customer: string;
   phone: string;
   priority: boolean;
+  position: string;
 }
